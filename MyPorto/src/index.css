@@ -15,10 +15,13 @@ html, body {
   height: 100%;
   margin: 0;
   padding: 0;
+  background-color: #000000;
+  overflow-x: hidden;
 }
 
 #root {
   width: 100%;
+  background-color: #000000;
 }
 
 :root {
@@ -201,4 +204,23 @@ button:focus-visible {
   body {
     @apply bg-background text-foreground;
   }
+}
+
+/* Horizontal scrollbar styling */
+div::-webkit-scrollbar {
+  height: 6px;
+}
+
+div::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+div::-webkit-scrollbar-thumb {
+  background: #FF6B6B;
+  border-radius: 3px;
+  transition: background 0.3s;
+}
+
+div::-webkit-scrollbar-thumb:hover {
+  background: #FF5252;
 }

@@ -2,6 +2,35 @@ import { useState, useEffect, useRef } from 'react'
 import BlurText from "./BlurText"
 import GooeyNav from './components/GooeyNav'
 import './App.css'
+const Halaman1 = '/Halaman1.png'
+
+
+function useInView(ref) {
+  const [isInView, setIsInView] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (ref.current) {
+      observer.observe(ref.current);
+    }
+
+    return () => {
+      if (ref.current) {
+        observer.unobserve(ref.current);
+      }
+    };
+  }, [ref]);
+
+  return isInView;
+}
 
 function App() {
   const [showNavbar, setShowNavbar] = useState(false);
@@ -10,28 +39,28 @@ function App() {
 
   useEffect(() => {
     const handleScroll = () => {
-      // Show navbar ketika scroll lebih dari 100px
-      if (window.scrollY > 100) {
-        setShowNavbar(true);
-      } else {
-        setShowNavbar(false);
-      }
-
       // Detect active section based on scroll position
-      const sections = document.querySelectorAll('section, [id="welcome"]');
+      const sections = document.querySelectorAll('section');
       let currentSectionIndex = 0;
 
       sections.forEach((section, index) => {
         const rect = section.getBoundingClientRect();
-        if (rect.top <= window.innerHeight / 2) {
+        // If section is visible in viewport, mark it as active
+        if (rect.top < window.innerHeight * 0.3) {
           currentSectionIndex = index;
         }
       });
 
+      // Navbar shows on all sections
+      const shouldShow = true;
+      setShowNavbar(shouldShow);
       setActiveSection(currentSectionIndex);
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    // Trigger once on mount
+    handleScroll();
+    
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -50,12 +79,10 @@ function App() {
   const getAnimationStyle = (sectionIndex) => {
     const scale = 1 - Math.abs(activeSection - sectionIndex) * 0.05;
     const opacity = 1 - Math.abs(activeSection - sectionIndex) * 0.2;
-    const blur = Math.abs(activeSection - sectionIndex) * 2;
 
     return {
       transform: `scale(${Math.max(0.9, scale)})`,
       opacity: Math.max(0.6, opacity),
-      filter: `blur(${blur}px)`,
       transition: 'all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1)'
     };
   };
@@ -63,33 +90,34 @@ function App() {
   return (
     <>
       {/* Navbar dengan GooeyNav */}
-      <nav style={{
-        position: 'fixed',
-        top: '0',
-        left: '0',
-        right: '0',
-        backgroundColor: 'rgba(0, 0, 0, 0.95)',
-        padding: window.innerWidth <= 768 ? '15px 20px' : '15px 40px',
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        zIndex: '1000',
-        opacity: showNavbar ? 1 : 0,
-        transform: showNavbar ? 'translateY(0)' : 'translateY(-100%)',
-        transition: 'all 0.3s ease-in-out',
-        backdropFilter: 'blur(10px)',
-        height: '70px',
-        flexWrap: 'wrap'
-      }}>
-        <h1 style={{ fontSize: '20px', fontWeight: 'bold', color: 'white', cursor: 'pointer' }} onClick={handleLogoClick}>Nauval</h1>
+      {showNavbar && (
+        <nav style={{
+          position: 'fixed',
+          top: '20px',
+          left: '50%',
+          transform: 'translateX(-50%)',
+          backgroundColor: 'rgba(20, 20, 30, 0.4)',
+          backdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          borderRadius: '50px',
+          padding: '4px 18px',
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          zIndex: '1000',
+          height: 'auto',
+          flexWrap: 'wrap',
+          boxShadow: '0 8px 32px 0 rgba(255, 107, 107, 0.3)',
+          animation: 'slideDown 0.3s ease-out'
+        }}>
         
         {/* Desktop GooeyNav */}
-        <div style={{ display: window.innerWidth > 768 ? 'flex' : 'none', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ display: window.innerWidth > 768 ? 'flex' : 'none', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
           <GooeyNav
             items={navItems}
-            particleCount={15}
-            particleDistances={[90, 10]}
-            particleR={100}
+            particleCount={10}
+            particleDistances={[55, 6]}
+            particleR={65}
             initialActiveIndex={activeSection - 1}
             animationTime={600}
             timeVariance={300}
@@ -106,23 +134,26 @@ function App() {
             border: 'none',
             cursor: 'pointer',
             color: 'white',
-            fontSize: '24px',
+            fontSize: '14px',
             zIndex: 1001
           }}
         >
           ☰
         </button>
-      </nav>
+        </nav>
+      )}
 
       {/* Mobile Menu */}
       {mobileMenuOpen && window.innerWidth <= 768 && (
         <div style={{
           position: 'fixed',
           top: '70px',
-          left: '0',
-          right: '0',
-          backgroundColor: 'rgba(0, 0, 0, 0.98)',
-          backdropFilter: 'blur(10px)',
+          left: '20px',
+          right: '20px',
+          backgroundColor: 'rgba(20, 20, 30, 0.9)',
+          backdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255, 255, 255, 0.1)',
+          borderRadius: '20px',
           padding: '20px',
           zIndex: '999',
           display: 'flex',
@@ -139,9 +170,11 @@ function App() {
                 color: activeSection - 1 === index ? '#FF6B6B' : '#fff',
                 textDecoration: 'none',
                 fontSize: '16px',
-                padding: '12px 0',
-                borderBottom: '1px solid #333',
-                transition: 'color 0.3s'
+                padding: '12px 16px',
+                borderRadius: '8px',
+                backgroundColor: activeSection - 1 === index ? 'rgba(255, 107, 107, 0.2)' : 'transparent',
+                transition: 'all 0.3s',
+                textAlign: 'center'
               }}
             >
               {item.label}
@@ -173,157 +206,140 @@ function App() {
 }
 
 function WelcomeSection({ activeSection, getAnimationStyle }) {
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-  const [gridCells, setGridCells] = useState([]);
-  const welcomeRef = useRef(null);
+  const [scrollY, setScrollY] = useState(0);
 
   useEffect(() => {
-    // Create grid cells
-    const cells = [];
-    const cellSize = 40;
-    const cols = Math.ceil(window.innerWidth / cellSize);
-    const rows = Math.ceil(window.innerHeight / cellSize);
-    
-    let id = 0;
-    for (let y = 0; y < rows; y++) {
-      for (let x = 0; x < cols; x++) {
-        cells.push({
-          id: id++,
-          x: x * cellSize,
-          y: y * cellSize,
-          size: cellSize
-        });
-      }
-    }
-    setGridCells(cells);
-  }, []);
-
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      if (welcomeRef.current) {
-        const rect = welcomeRef.current.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        setMousePos({ x, y });
-      }
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
     };
 
-    const welcomeSection = document.getElementById('welcome');
-    if (welcomeSection) {
-      welcomeSection.addEventListener('mousemove', handleMouseMove);
-      return () => welcomeSection.removeEventListener('mousemove', handleMouseMove);
-    }
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   return (
-    <>
-      {/* Section Welcome */}
-      <div id="welcome" ref={welcomeRef} style={{ 
-        minHeight: '100vh', 
-        display: 'flex',
-        alignItems: 'center', 
-        justifyContent: 'flex-start', 
-        padding: '20px', 
-        position: 'relative', 
-        overflow: 'hidden', 
+    <section 
+      id="welcome" 
+      className="relative w-full h-screen flex items-center justify-center overflow-hidden"
+      style={{
+        position: 'relative',
+        width: '100%',
+        minHeight: '100vh',
         backgroundColor: '#000',
         ...getAnimationStyle(0)
-      }}>
-        {/* Grid Cells Background */}
-        {gridCells.map(cell => {
-          const distance = Math.sqrt(
-            Math.pow(mousePos.x - (cell.x + cell.size / 2), 2) + 
-            Math.pow(mousePos.y - (cell.y + cell.size / 2), 2)
-          );
-          const maxDistance = 200;
-          const opacity = Math.max(0, 1 - distance / maxDistance) * 0.8;
-          
-          return (
-            <div
-              key={cell.id}
-              style={{
-                position: 'absolute',
-                left: `${cell.x}px`,
-                top: `${cell.y}px`,
-                width: `${cell.size}px`,
-                height: `${cell.size}px`,
-                border: `1px solid rgba(255, 107, 107, ${opacity * 0.6})`,
-                backgroundColor: `rgba(255, 107, 107, ${opacity * 0.1})`,
-                pointerEvents: 'none',
-                transition: 'all 0.1s ease-out',
-                boxShadow: opacity > 0.3 ? `0 0 ${opacity * 20}px rgba(255, 107, 107, ${opacity * 0.8})` : 'none'
-              }}
-            />
-          );
-        })}
-
-        {/* Cursor Glow Circle */}
-        <div style={{
+      }}
+    >
+      <img 
+        src={Halaman1} 
+        alt="background" 
+        style={{
           position: 'absolute',
-          width: '150px',
-          height: '150px',
-          background: `radial-gradient(circle, rgba(255,107,107,0.3) 0%, transparent 70%)`,
-          borderRadius: '50%',
-          left: `${mousePos.x}px`,
-          top: `${mousePos.y}px`,
-          transform: 'translate(-50%, -50%)',
-          pointerEvents: 'none',
-          filter: 'blur(20px)',
-          transition: 'all 0.1s ease-out'
-        }} />
+          top: '0',
+          left: '0',
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          objectPosition: 'center',
+          zIndex: '1',
+          transform: `translateY(${scrollY * 0.5}px)`,
+          transition: 'transform 0.1s ease-out'
+        }}
+      />
 
-        {/* Content - Left aligned */}
-        <div style={{ 
-          position: 'relative', 
-          zIndex: '2', 
-          maxWidth: '600px',
-          paddingLeft: window.innerWidth <= 768 ? '0' : '60px'
-        }}>
-          <BlurText
-            text="Nauval Badiul Fikri Alhadad Hs"
-            delay={300}
-            animateBy="words"
-            direction="top"
-            className="mb-8"
-            style={{ 
-              fontSize: 'clamp(32px, 8vw, 80px)',
-              fontWeight: 'bold',
-              textAlign: window.innerWidth <= 768 ? 'center' : 'left',
-              width: '100%',
-              overflow: 'hidden',
-              wordBreak: 'break-word',
-              whiteSpace: 'normal',
-              color: '#fff'
-            }}
-          />
-          <BlurText
-            text="Portofolio"
-            delay={300}
-            animateBy="words"
-            direction="top"
-            className="mb-8"
-            style={{ 
-              fontSize: 'clamp(32px, 8vw, 80px)',
-              fontWeight: 'bold',
-              textAlign: window.innerWidth <= 768 ? 'center' : 'left',
-              width: '100%',
-              overflow: 'hidden',
-              wordBreak: 'break-word',
-              whiteSpace: 'normal',
-              color: '#fff'
-            }}
-          />
-        </div>
+      {/* Overlay fade effect saat scroll */}
+      <div
+        style={{
+          position: 'absolute',
+          top: '0',
+          left: '0',
+          width: '100%',
+          height: '100%',
+          backgroundColor: 'rgba(0, 0, 0, 0)',
+          zIndex: '2',
+          pointerEvents: 'none',
+          opacity: Math.min(scrollY / 500, 0.7),
+          transition: 'opacity 0.1s ease-out'
+        }}
+      />
+      
+      {/* Scroll Down Animation */}
+      <style>{`
+        @keyframes bounce-down {
+          0%, 100% {
+            transform: translateY(0);
+            opacity: 1;
+          }
+          50% {
+            transform: translateY(15px);
+            opacity: 0.5;
+          }
+        }
+        
+        @keyframes fade-in-out {
+          0%, 100% {
+            opacity: 0;
+          }
+          50% {
+            opacity: 1;
+          }
+        }
+        
+        .scroll-down {
+          position: absolute;
+          bottom: 40px;
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 10;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 10px;
+        }
+        
+        .scroll-down-text {
+          color: #FF6B6B;
+          font-size: 14px;
+          font-weight: 500;
+          letter-spacing: 2px;
+          animation: fade-in-out 2.5s ease-in-out infinite;
+        }
+        
+        .scroll-down-arrow {
+          color: #FF6B6B;
+          font-size: 28px;
+          animation: bounce-down 2.5s ease-in-out infinite;
+        }
+      `}</style>
+      
+      <div className="scroll-down" style={{ opacity: scrollY < 100 ? 1 : 0, transition: 'opacity 0.3s ease-out' }}>
+        <span className="scroll-down-text">SCROLL</span>
+        <div className="scroll-down-arrow">↓</div>
       </div>
-    </>
-  )
+    </section>
+  );
 }
 
 function AppSections({ activeSection, getAnimationStyle }) {
+  const homeRef = useRef(null);
+  const aboutRef = useRef(null);
+  const projectsRef = useRef(null);
+  const contactRef = useRef(null);
+
+  const homeInView = useInView(homeRef);
+  const aboutInView = useInView(aboutRef);
+  const projectsInView = useInView(projectsRef);
+  const contactInView = useInView(contactRef);
+
+  const fadeInUp = (isInView) => ({
+    opacity: isInView ? 1 : 0,
+    transform: isInView ? 'translateY(0)' : 'translateY(40px)',
+    transition: 'all 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)'
+  });
+
   return (
     <>
       {/* Section 2: Home */}
-      <section id="home" style={{ 
+      <section ref={homeRef} id="home" style={{ 
         minHeight: '100vh', 
         display: 'flex', 
         alignItems: 'center', 
@@ -335,7 +351,7 @@ function AppSections({ activeSection, getAnimationStyle }) {
       }}>
         <div style={{ maxWidth: '1200px', width: '100%', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '40px' }}>
           {/* Left Content */}
-          <div>
+          <div style={fadeInUp(homeInView)}>
             <p style={{ fontSize: 'clamp(16px, 4vw, 20px)', color: '#888', marginBottom: '10px' }}>Hello .</p>
             <h1 style={{ fontSize: 'clamp(28px, 6vw, 48px)', fontWeight: 'bold', marginBottom: '20px' }}>I'm Nauval</h1>
             <h2 style={{ fontSize: 'clamp(24px, 5vw, 40px)', fontWeight: 'bold', marginBottom: '30px', color: '#888' }}>Web Developer</h2>
@@ -343,31 +359,43 @@ function AppSections({ activeSection, getAnimationStyle }) {
               <button style={{ padding: '12px 30px', backgroundColor: '#FF6B6B', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '16px' }}>Got a project?</button>
               <button style={{ padding: '12px 30px', backgroundColor: 'transparent', color: 'white', border: '1px solid white', borderRadius: '4px', cursor: 'pointer', fontSize: '16px' }}>My resume</button>
             </div>
-            <div style={{ display: 'flex', gap: '30px', flexWrap: 'wrap', fontSize: 'clamp(14px, 3vw, 16px)', color: '#666' }}>
-              <div style={{ position: 'relative', paddingBottom: '8px' }}>
-                <span style={{ display: 'block' }}>HTML</span>
-                <div style={{ position: 'absolute', bottom: '0', left: '0', right: '0', height: '2px',  }}></div>
-              </div>
-              <div style={{ position: 'relative', paddingBottom: '8px' }}>
-                <span style={{ display: 'block' }}>CSS</span>
-                <div style={{ position: 'absolute', bottom: '0', left: '0', right: '0', height: '2px',  }}></div>
-              </div>
-              <div style={{ position: 'relative', paddingBottom: '8px' }}>
-                <span style={{ display: 'block' }}>Javascript</span>
-                <div style={{ position: 'absolute', bottom: '0', left: '0', right: '0', height: '2px',  }}></div>
-              </div>
-              <div style={{ position: 'relative', paddingBottom: '8px' }}>
-                <span style={{ display: 'block' }}>Laravel</span>
-                <div style={{ position: 'absolute', bottom: '0', left: '0', right: '0', height: '2px',  }}></div>
-              </div>
-              <div style={{ position: 'relative', paddingBottom: '8px' }}>
-                <span style={{ display: 'block' }}>React</span>
-                <div style={{ position: 'absolute', bottom: '0', left: '0', right: '0', height: '2px',  }}></div>
-              </div>
-              <div style={{ position: 'relative', paddingBottom: '8px' }}>
-                <span style={{ display: 'block' }}>Python</span>
-                <div style={{ position: 'absolute', bottom: '0', left: '0', right: '0', height: '2px', }}></div>
-              </div>
+            <div style={{ 
+              display: 'flex', 
+              gap: '30px', 
+              fontSize: 'clamp(14px, 3vw, 16px)', 
+              color: '#666',
+              overflowX: 'auto',
+              paddingBottom: '10px',
+              scrollBehavior: 'smooth',
+              scrollSnapType: 'x mandatory'
+            }}>
+              {[
+                { name: 'HTML', color: '#FF6B6B' },
+                { name: 'CSS', color: '#4ECDC4' },
+                { name: 'Javascript', color: '#F7DC6F' },
+                { name: 'Laravel', color: '#E74C3C' },
+                { name: 'React', color: '#3498DB' },
+                { name: 'Python', color: '#2ECC71' }
+              ].map((skill, idx) => (
+                <div key={idx} style={{ 
+                  position: 'relative', 
+                  paddingBottom: '8px',
+                  minWidth: 'max-content',
+                  scrollSnapAlign: 'start',
+                  whiteSpace: 'nowrap'
+                }}>
+                  <span style={{ display: 'block', color: '#fff' }}>{skill.name}</span>
+                  <div style={{ 
+                    position: 'absolute', 
+                    bottom: '0', 
+                    left: '0', 
+                    right: '0', 
+                    height: '2px',
+                    backgroundColor: skill.color,
+                    boxShadow: `0 0 10px ${skill.color}40`
+                  }}></div>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -392,7 +420,7 @@ function AppSections({ activeSection, getAnimationStyle }) {
       </section>
 
       {/* Section 3: About */}
-      <section id="about" style={{ 
+      <section ref={aboutRef} id="about" style={{ 
         minHeight: '100vh', 
         display: 'flex', 
         alignItems: 'center', 
@@ -402,7 +430,7 @@ function AppSections({ activeSection, getAnimationStyle }) {
         color: '#fff',
         ...getAnimationStyle(2)
       }}>
-        <div style={{ maxWidth: '1200px', width: '100%' }}>
+        <div style={{ maxWidth: '1200px', width: '100%', ...fadeInUp(aboutInView) }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '60px' }}>
             {/* Left Services */}
             <div>
@@ -452,7 +480,7 @@ function AppSections({ activeSection, getAnimationStyle }) {
       </section>
 
       {/* Section 4: Projects */}
-      <section id="projects" style={{ 
+      <section ref={projectsRef} id="projects" style={{ 
         minHeight: '100vh', 
         display: 'flex', 
         alignItems: 'center', 
@@ -462,7 +490,7 @@ function AppSections({ activeSection, getAnimationStyle }) {
         color: '#fff',
         ...getAnimationStyle(3)
       }}>
-        <div style={{ maxWidth: '1200px', width: '100%' }}>
+        <div style={{ maxWidth: '1200px', width: '100%', ...fadeInUp(projectsInView) }}>
           <h2 style={{ fontSize: 'clamp(32px, 6vw, 48px)', fontWeight: 'bold', marginBottom: '60px', textAlign: 'center' }}>Projects</h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '30px' }}>
             {[1, 2, 3, 4, 5, 6].map((project) => (
@@ -497,7 +525,7 @@ function AppSections({ activeSection, getAnimationStyle }) {
       </section>
 
       {/* Section 5: Contact */}
-      <section id="contact" style={{ 
+      <section ref={contactRef} id="contact" style={{ 
         minHeight: '100vh', 
         display: 'flex', 
         alignItems: 'center', 
@@ -507,10 +535,10 @@ function AppSections({ activeSection, getAnimationStyle }) {
         color: '#fff',
         ...getAnimationStyle(4)
       }}>
-        <div style={{ maxWidth: '800px', width: '100%', textAlign: 'center' }}>
+        <div style={{ maxWidth: '800px', width: '100%', textAlign: 'center', ...fadeInUp(contactInView) }}>
           <h2 style={{ fontSize: 'clamp(32px, 6vw, 48px)', fontWeight: 'bold', marginBottom: '30px' }}>Let's Work Together</h2>
           <p style={{ fontSize: 'clamp(14px, 3vw, 18px)', color: '#aaa', marginBottom: '40px' }}>I'm always interested in hearing about new projects and opportunities.</p>
-          <a href="mailto:contact@example.com" style={{
+          <a href="mailto:badiulfikri24@gmail.com" style={{
             display: 'inline-block',
             padding: '15px 40px',
             backgroundColor: '#FF6B6B',
