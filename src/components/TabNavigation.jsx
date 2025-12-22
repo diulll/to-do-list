@@ -7,20 +7,20 @@ function TabNavigation({ activeTab, onTabChange }) {
   ];
 
   return (
-    <div className="flex gap-10 px-12 bg-white border-b border-gray-200">
+    <div className="flex gap-8 px-8 bg-white border-b border-gray-200">
       {tabs.map((tab) => (
         <button
           key={tab.id}
           onClick={() => onTabChange(tab.id)}
-          className={`py-4 text-[15px] font-medium transition-all duration-200 relative ${
+          className={`py-3.5 text-sm font-medium transition-colors duration-150 relative ${
             activeTab === tab.id
-              ? 'text-gray-900'
-              : 'text-gray-500 hover:text-gray-800'
+              ? 'text-blue-600'
+              : 'text-gray-600 hover:text-gray-900'
           }`}
         >
           {tab.label}
           {activeTab === tab.id && (
-            <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-gray-900 rounded-t"></div>
+            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"></div>
           )}
         </button>
       ))}

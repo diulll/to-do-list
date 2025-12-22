@@ -1,4 +1,4 @@
-import { CheckSquare, Home, List, Settings } from 'lucide-react';
+import { Home, List, Settings } from 'lucide-react';
 
 function Sidebar({ currentPage, setCurrentPage }) {
   const menuItems = [
@@ -8,17 +8,14 @@ function Sidebar({ currentPage, setCurrentPage }) {
   ];
 
   return (
-    <div className="w-[280px] bg-white border-r border-gray-200 flex flex-col shadow-sm">
+    <div className="w-64 bg-gray-900 flex flex-col">
       {/* Header */}
-      <div className="px-8 py-6 flex items-center gap-2.5 border-b border-gray-100">
-        <div className="w-6 h-6 bg-gray-900 rounded flex items-center justify-center flex-shrink-0">
-          <CheckSquare size={14} className="text-white" strokeWidth={2.5} />
-        </div>
-        <h1 className="text-xl font-bold text-gray-900 tracking-tight">TaskMaster</h1>
+      <div className="px-6 py-5 border-b border-gray-800">
+        <h1 className="text-xl font-bold text-white">TaskMaster</h1>
       </div>
 
       {/* Menu Items */}
-      <nav className="px-4 py-6 space-y-1">
+      <nav className="px-3 py-4 flex-1">
         {menuItems.map((item) => {
           const Icon = item.icon;
           const isActive = currentPage === item.id;
@@ -26,14 +23,14 @@ function Sidebar({ currentPage, setCurrentPage }) {
             <button
               key={item.id}
               onClick={() => setCurrentPage(item.id)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors duration-150 mb-1 ${
                 isActive
-                  ? 'bg-gray-100 text-gray-900 font-medium'
-                  : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  ? 'bg-blue-600 text-white'
+                  : 'text-gray-300 hover:bg-gray-800 hover:text-white'
               }`}
             >
-              <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
-              <span className="text-[15px]">{item.label}</span>
+              <Icon size={20} strokeWidth={2} />
+              <span className="text-sm font-medium">{item.label}</span>
             </button>
           );
         })}
