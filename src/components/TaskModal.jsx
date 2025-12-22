@@ -39,25 +39,25 @@ function TaskModal({ isOpen, task, onClose, onSave }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 backdrop-blur-sm">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 overflow-hidden animate-in fade-in duration-200">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+      <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
         {/* Header */}
-        <div className="flex justify-between items-center px-6 py-5 border-b border-gray-200">
-          <h2 className="text-xl font-bold text-gray-900">
+        <div className="flex justify-between items-center px-6 py-4 border-b border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900">
             {task ? 'Edit Task' : 'New Task'}
           </h2>
           <button
             onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-all duration-200"
+            className="p-1.5 hover:bg-gray-100 rounded-md transition-colors duration-150"
           >
             <X size={20} className="text-gray-500" />
           </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-5">
+        <form onSubmit={handleSubmit} className="p-6 space-y-4">
           <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
               Task Title
             </label>
             <input
@@ -65,19 +65,19 @@ function TaskModal({ isOpen, task, onClose, onSave }) {
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               placeholder="Enter task title"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all duration-200 text-[15px]"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
               autoFocus
             />
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
               Category
             </label>
             <select
               value={formData.category}
               onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all duration-200 bg-white text-[15px] cursor-pointer"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white text-sm cursor-pointer"
             >
               <option value="">Select a category</option>
               {categories.map((cat) => (
@@ -87,14 +87,14 @@ function TaskModal({ isOpen, task, onClose, onSave }) {
           </div>
 
           <div>
-            <label className="block text-sm font-semibold text-gray-900 mb-2">
+            <label className="block text-sm font-medium text-gray-700 mb-1.5">
               Description (Optional)
             </label>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               placeholder="Add task details..."
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-900 focus:border-transparent transition-all duration-200 resize-none text-[15px]"
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none text-sm"
               rows="3"
             />
           </div>
@@ -104,13 +104,13 @@ function TaskModal({ isOpen, task, onClose, onSave }) {
             <button
               type="button"
               onClick={onClose}
-              className="flex-1 px-5 py-3 border-2 border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-semibold transition-all duration-200 text-sm"
+              className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors duration-150 text-sm"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="flex-1 px-5 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 font-semibold transition-all duration-200 shadow-lg hover:shadow-xl text-sm"
+              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors duration-150 text-sm"
             >
               {task ? 'Update' : 'Create'}
             </button>
