@@ -2,9 +2,9 @@ import { Trash2, Edit2 } from 'lucide-react';
 
 function TaskItem({ task, onToggle, onEdit, onDelete }) {
   return (
-    <div className="flex items-center gap-4 pl-8 pr-16 py-4 hover:bg-gray-50 transition-colors duration-150 group border-b border-gray-100">
+    <div className="flex items-center gap-4 px-8 py-12 hover:bg-gray-50 transition-colors duration-150 group border-b border-gray-100 last:border-b-0">
       <div className="flex-1 min-w-0">
-        <h3 className={`font-medium text-base mb-1 ${
+        <h3 className={`font-medium text-base mb-3 ${
           task.completed 
             ? 'line-through text-gray-400' 
             : 'text-gray-900'
